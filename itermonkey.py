@@ -6,6 +6,7 @@ import argparse
 import re
 import subprocess
 from os.path import expanduser
+from math import ceil
 
 home = expanduser("~")
 host_re = re.compile(r"host\s+(\S+)", re.IGNORECASE)
@@ -18,6 +19,9 @@ parser = argparse.ArgumentParser(
 parser.add_argument("-r", "--run", dest="should_actually_run", action="store_true", default=False, 
     help="Must pass this to actually run, otherwise will just list matching hosts")
 parser.add_argument("pattern", help="A regular expression used to select hosts by name")
+parser.add_argument("-d", "--debug", action="store_true", default=False, 
+    help="Just dump Applescript, do not execute")
+arguments = parser.parse_args()
 
 
 def load_hosts():
@@ -57,12 +61,45 @@ def prompt_for_confirmation(hosts_count):
     return choice == "y"
 
 
-def prepare_and_run_applescript(selected_hosts):
-    osa = subprocess.Popen(['osascript', '-'],
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE)
+def create_pane(parent, child, orientation):
+    return """
+        tell pane_{parent}
+            set pane_{child} to (split {orientation}ly with same profile)
+        end tell
+        """.format(parent=parent, child=child, orientation=orientation)
 
-    script_lines = """
+
+def init_pane(number, host):
+    return """
+        tell pane_{number}
+            write text "ssh {host}"
+            set name to "this is me testing"
+        end tell
+        """.format(number=number, host=host)
+
+
+def prepare_and_run_applescript(selected_hosts):
+    num_panes = len(selected_hosts)
+    vertical_splits = int(ceil((num_panes / 2.0))) - 1
+    second_columns = num_panes / 2
+    pane_creation = ""
+
+    for p in range(0, vertical_splits):
+        parent = (p * 2) + 1
+        child = parent + 2
+        pane_creation += create_pane(parent, child, "horizontal")
+
+    for p in range(0, second_columns):
+        parent = (p * 2) + 1
+        child = parent + 1
+        pane_creation += create_pane(parent, child, "vertical")
+
+    pane_initialization = ""
+
+    for i in range(0, num_panes):
+        pane_initialization += init_pane(i + 1, selected_hosts[i])
+
+    script = """
         tell application "iTerm"
             activate
             tell current window
@@ -71,16 +108,25 @@ def prepare_and_run_applescript(selected_hosts):
 
             set pane_1 to (current session of current window)
 
-            tell pane_1
-                write text "ssh {host}"
-                set name to "this is me testing"
-            end tell
-
+            {pane_creation}
+            {pane_initialization}
         end tell
-        """.format(host=selected_hosts[0])
-    script = script_lines  # "\n".join(script_lines)
+        """.format(pane_creation=pane_creation, pane_initialization=pane_initialization)
+
+    if arguments.debug:
+        print(script)
+        exit(0)
+
+    osa = subprocess.Popen(['osascript', '-'],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE)
     output = osa.communicate(script)[0]
     print(output)
+
+
+def sort_hosts(selected_hosts):
+    ## ToDo do better than lexicographycal sorting
+    return sorted(selected_hosts)
 
 
 def main():
@@ -88,18 +134,19 @@ def main():
         print("iTerm2 version not supported or iTerm2 is not installed")
         exit(1)
 
-    arguments = parser.parse_args()
     pat = re.compile(arguments.pattern, re.IGNORECASE)
     load_hosts()
 
     # get filtered list of hosts, each a tuple (name, address)
-    selected_hosts = [(name, address) for (name, address) in hostname_by_host.items() if pat.search(name)]
+    selected_hosts = list(host for host in hostname_by_host.keys() if pat.search(host))
+    selected_hosts = sort_hosts(selected_hosts)
+
     print("Will open the following terminal panes:\n")
-    for (name, address) in sorted(selected_hosts, key=lambda tuple: tuple[0]):  # sort by host name
-        print("- %s (%s)" % (name, address))
+    for host in selected_hosts:
+        print("- %s" % host)
     
-    if prompt_for_confirmation(len(selected_hosts)):
-        prepare_and_run_applescript([name for (name, address) in selected_hosts])
+    if arguments.debug or prompt_for_confirmation(len(selected_hosts)):
+        prepare_and_run_applescript(selected_hosts)
 
 
 main()
