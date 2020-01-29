@@ -13,8 +13,6 @@ hostname_re = re.compile(r"hostname\s+(\S+)", re.IGNORECASE)
 
 hostname_by_host = {}
 
-SAFETY_THRESHOLD = 6
-
 parser = argparse.ArgumentParser(
     description="Tool to automatically open several ssh connections in iTerm2 by querying ~/.ssh/config")
 parser.add_argument("-r", "--run", dest="should_actually_run", action="store_true", default=False, 
@@ -36,16 +34,6 @@ def load_hosts():
                     current_host = None
 
 
-def do_safety_check(hosts_count):
-    if hosts_count > SAFETY_THRESHOLD:
-        while True:
-            sys.stdout.write("Will open %d hosts. Are you sure? [y/N] " % hosts_count)
-            choice = raw_input().strip().lower()
-            if choice in ["y", "n", ""]:
-                return choice == "y"
-    return True
-
-
 def check_if_iterm_version_is_supported():
     osa = subprocess.Popen(['osascript', '-'],
                             stdin=subprocess.PIPE,
@@ -62,7 +50,8 @@ def check_if_iterm_version_is_supported():
     return False
 
 
-def prompt_for_confirmation():
+def prompt_for_confirmation(hosts_count):
+    print("\nNumber of panes to open: %d" % hosts_count)
     sys.stdout.write("Press 'y' to continue or anything else to abort: ")
     choice = raw_input().strip().lower()
     return choice == "y"
@@ -105,12 +94,11 @@ def main():
 
     # get filtered list of hosts, each a tuple (name, address)
     selected_hosts = [(name, address) for (name, address) in hostname_by_host.items() if pat.search(name)]
-    print("Will open the following terminal panes:")
-    if do_safety_check(len(selected_hosts)):
-        for (name, address) in sorted(selected_hosts, key=lambda tuple: tuple[0]):  # sort by host name
-            print("- %s (%s)" % (name, address))
+    print("Will open the following terminal panes:\n")
+    for (name, address) in sorted(selected_hosts, key=lambda tuple: tuple[0]):  # sort by host name
+        print("- %s (%s)" % (name, address))
     
-    if prompt_for_confirmation():
+    if prompt_for_confirmation(len(selected_hosts)):
         prepare_and_run_applescript([name for (name, address) in selected_hosts])
 
 
