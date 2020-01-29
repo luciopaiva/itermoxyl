@@ -11,6 +11,9 @@ from math import ceil
 home = expanduser("~")
 host_re = re.compile(r"host\s+(\S+)", re.IGNORECASE)
 hostname_re = re.compile(r"hostname\s+(\S+)", re.IGNORECASE)
+# this regexp will extract a integer suffix, if ones exists, then use 
+# the prefix as first sorting field and the suffix and the second one
+host_split = re.compile(r"(\D+(?:\d+\D+)*)(\d+)")
 
 hostname_by_host = {}
 
@@ -124,9 +127,19 @@ def prepare_and_run_applescript(selected_hosts):
     print(output)
 
 
+def split_host_by_prefix_and_suffix(host):
+    result = host_split.match(host)
+    if result:
+        prefix = result.group(1)
+        suffix = result.group(2) if result.group(2) else 0
+    else:
+        prefix = host
+        suffix = 0
+    return (prefix, suffix)
+
+
 def sort_hosts(selected_hosts):
-    ## ToDo do better than lexicographycal sorting
-    return sorted(selected_hosts)
+    return sorted(selected_hosts, key=lambda host: split_host_by_prefix_and_suffix(host))
 
 
 def main():
