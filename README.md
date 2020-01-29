@@ -48,6 +48,12 @@ Another possibility:
 
 Will open `server-1-a` and `server-2-a`.
 
+## How to install
+
+Simply download this repository and possibly add it to the path if you find convenient.
+
+You need to have iTerm2 installed, of course, but nothing more. The script is written in Python 2.7 and your MacOS already comes with it installed.
+
 ---
 
 Inspired by [itermocil](https://github.com/TomAnthony/itermocil), which was inspired by [teamocil](https://github.com/remiprev/teamocil).
