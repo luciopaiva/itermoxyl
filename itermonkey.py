@@ -14,7 +14,8 @@ hostname_by_host = {}
 
 SAFETY_THRESHOLD = 6
 
-parser = argparse.ArgumentParser(description="Automate opening ssh connections in iTerm2")
+parser = argparse.ArgumentParser(
+    description="Tool to automatically open several ssh connections in iTerm2 by querying ~/.ssh/config")
 parser.add_argument("-r", "--run", dest="should_actually_run", action="store_true", default=False, 
     help="Must pass this to actually run, otherwise will just list matching hosts")
 parser.add_argument("pattern", help="A regular expression used to select hosts by name")
