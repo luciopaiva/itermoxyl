@@ -8,6 +8,10 @@ import sys
 from math import ceil
 from os.path import expanduser
 
+VERSION_MAJOR = 1
+VERSION_MINOR = 0
+VERSION_PATCH = 0
+
 home = expanduser("~")
 host_re = re.compile(r"host\s+([^\s*?]+)", re.IGNORECASE)
 hostname_re = re.compile(r"hostname\s+(\S+)", re.IGNORECASE)
@@ -19,9 +23,10 @@ parser = argparse.ArgumentParser(
     description="Tool to automatically open several ssh connections in iTerm2 by querying ~/.ssh/config")
 parser.add_argument("-r", "--run", dest="should_actually_run", action="store_true", default=False,
                     help="Must pass this to actually run, otherwise will just list matching hosts")
-parser.add_argument("pattern", help="A regular expression used to select hosts by name")
 parser.add_argument("-d", "--debug", action="store_true", default=False,
                     help="Just dump Applescript, do not execute")
+parser.add_argument("-v", "--version", action="store_true", default=False, help="Just print version and exit")
+parser.add_argument("pattern", nargs='?', help="Regular expression used to filter hosts by name", default=None)
 arguments = parser.parse_args()
 
 
@@ -75,7 +80,7 @@ def check_if_iterm_version_is_supported():
 
 def prompt_for_confirmation(hosts_count):
     print("\nNumber of panes to open: %d" % hosts_count)
-    sys.stdout.write("Press 'y' to continue or anything else to abort: ")
+    sys.stdout.write("Press 'y' to continue (or any other key to abort): ")
     choice = raw_input().strip().lower()
     return choice == "y"
 
@@ -164,8 +169,16 @@ def sort_hosts(selected_hosts):
 
 
 def main():
+    if arguments.version:
+        print("{}.{}.{}".format(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH))
+        exit(0)
+
     if not check_if_iterm_version_is_supported():
         print("iTerm2 version not supported or not installed")
+        exit(1)
+
+    if arguments.pattern is None:
+        parser.print_help()
         exit(1)
 
     pat = re.compile(arguments.pattern, re.IGNORECASE)
