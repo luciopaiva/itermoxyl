@@ -9,8 +9,8 @@ It is a slightly different medicine for a slightly different problem. iTermoxyl 
 
 `cd` to the destination directory and:
 
-    curl -O https://raw.githubusercontent.com/luciopaiva/itermoxyl/master/itermoxyl.py
-    chmod u+x itermoxyl.py
+    curl -O https://raw.githubusercontent.com/luciopaiva/itermoxyl/master/itermoxyl
+    chmod u+x itermoxyl
 
 You need to have iTerm2 installed (obviously), but nothing else. The script is written in Python 2.7 and your macOS already comes bundled with it.
 
@@ -45,19 +45,19 @@ Host server-2-b
 
 You could run the following command:
 
-    ./itermoxyl.py foo
+    ./itermoxyl foo
 
 Which will open a new tab in the current window and then spawn 4 panes in it. Each pane will automatically open a connection to one of the hosts matching `foo`.
 
 You could also:
 
-    ./itermoxyl.py '2$'
+    ./itermoxyl '2$'
 
 Which will open a new tab, but this time with 2 panes, one for `foo-2` and another for `bar-2`. It won't match neither `server-2-a` nor `server-2-b`.
 
 Another possibility:
 
-    ./itermoxyl.py 'server.*?a'
+    ./itermoxyl 'server.*?a'
 
 Will match `server-1-a` and `server-2-a`.
 
