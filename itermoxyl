@@ -32,6 +32,12 @@ def load_hosts():
     with open(home + "/.ssh/config") as f:
         current_host = None
         for line in f.readlines():
+            # skip comment lines
+            line = line.strip()
+            if line.startswith("#"):
+                continue
+
+            # look for `Host` lines
             result = host_re.search(line)
             if result:
                 current_host = result.group(1)
