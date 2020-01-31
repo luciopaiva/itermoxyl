@@ -144,7 +144,7 @@ def sort_hosts(selected_hosts):
 
 def main():
     if not check_if_iterm_version_is_supported():
-        print("iTerm2 version not supported or iTerm2 is not installed")
+        print("iTerm2 version not supported or not installed")
         exit(1)
 
     pat = re.compile(arguments.pattern, re.IGNORECASE)
