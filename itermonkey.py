@@ -152,6 +152,11 @@ def main():
 
     # get filtered list of hosts, each a tuple (name, address)
     selected_hosts = list(host for host in hostname_by_host.keys() if pat.search(host))
+
+    if len(selected_hosts) == 0:
+        print("There are no hosts that match the given filter.")
+        exit(0)
+
     selected_hosts = sort_hosts(selected_hosts)
 
     print("Will open the following terminal panes:\n")
