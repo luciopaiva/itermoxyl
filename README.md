@@ -45,19 +45,19 @@ Host server-2-b
 
 You could run the following command:
 
-    ./itermoxyl foo
+    itermoxyl foo
 
 Which will open a new tab in the current window and then spawn 4 panes in it. Each pane will automatically open a connection to one of the hosts matching `foo`.
 
 You could also:
 
-    ./itermoxyl '2$'
+    itermoxyl '2$'
 
 Which will open a new tab, but this time with 2 panes, one for `foo-2` and another for `bar-2`. It won't match neither `server-2-a` nor `server-2-b`.
 
 Another possibility:
 
-    ./itermoxyl 'server.*?a'
+    itermoxyl 'server.*?a'
 
 Will match `server-1-a` and `server-2-a`.
 
