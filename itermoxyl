@@ -15,8 +15,6 @@ hostname_re = re.compile(r"hostname\s+(\S+)", re.IGNORECASE)
 # the prefix as first sorting field and the suffix and the second one
 host_split = re.compile(r"(\D+(?:\d+\D+)*)(\d+)")
 
-available_hosts = set()
-
 parser = argparse.ArgumentParser(
     description="Tool to automatically open several ssh connections in iTerm2 by querying ~/.ssh/config")
 parser.add_argument("-r", "--run", dest="should_actually_run", action="store_true", default=False,
@@ -37,6 +35,8 @@ def load_hosts():
     """ Here we collect all hosts available in ~/.ssh/config.
     """
     with open(home + "/.ssh/config") as f:
+        available_hosts = set()
+
         current_host = None
         for line in f.readlines():
             # skip comment lines
@@ -53,6 +53,8 @@ def load_hosts():
                 result = hostname_re.search(line)
                 if result:
                     available_hosts.add(current_host)
+
+        return available_hosts
 
 
 def check_if_iterm_version_is_supported():
@@ -142,10 +144,15 @@ def prepare_and_run_applescript(selected_hosts):
 
 
 def split_host_by_prefix_and_suffix(host):
+    """ This is a hack to get hosts correctly ordered by number. When ordering, we'd expect "foo1, foo2, ... foo10", but
+        when we order lexicographically, we get "foo1, foo10, foo2, ...". So this method splits the common prefix apart
+        from the number suffix (in case there is one), then order first by the prefix and if there's a draw, order by
+        suffix.
+    """
     result = host_split.match(host)
     if result:
         prefix = result.group(1)
-        suffix = result.group(2) if result.group(2) else 0
+        suffix = int(result.group(2)) if result.group(2) else 0
     else:
         prefix = host
         suffix = 0
@@ -162,7 +169,7 @@ def main():
         exit(1)
 
     pat = re.compile(arguments.pattern, re.IGNORECASE)
-    load_hosts()
+    available_hosts = load_hosts()
 
     # get filtered list of hosts, each a tuple (name, address)
     selected_hosts = list(host for host in available_hosts if pat.search(host))
