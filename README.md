@@ -1,14 +1,16 @@
 
-# itermonkey
+# iTermoxyl
 
-Tool to automatically open multiple ssh connections in [iTerm2](https://iterm2.com/) by directly querying `~/.ssh/config` using regular expressions.
+iTermoxyl is command line tool to automatically open multiple ssh connections in [iTerm2](https://iterm2.com/) by directly querying `~/.ssh/config` using regular expressions.
+
+It is a slightly different medicine for a slightly different problem. iTermoxyl was inspired by [itermocil](https://github.com/TomAnthony/itermocil), which was inspired by [teamocil](https://github.com/remiprev/teamocil).
 
 ## How to install
 
 `cd` to the destination directory and:
 
-    curl -O https://raw.githubusercontent.com/luciopaiva/itermonkey/master/itermonkey.py
-    chmod u+x itermonkey.py
+    curl -O https://raw.githubusercontent.com/luciopaiva/itermoxyl/master/itermoxyl.py
+    chmod u+x itermoxyl.py
 
 You need to have iTerm2 installed (obviously), but nothing else. The script is written in Python 2.7 and your macOS already comes bundled with it.
 
@@ -43,24 +45,21 @@ Host server-2-b
 
 You could run the following command:
 
-    ./itermonkey.py foo
+    ./itermoxyl.py foo
 
 Which will open a new tab in the current window and then spawn 4 panes in it. Each pane will automatically open a connection to one of the hosts matching `foo`.
 
 You could also:
 
-    ./itermonkey.py '2$'
+    ./itermoxyl.py '2$'
 
 Which will open a new tab, but this time with 2 panes, one for `foo-2` and another for `bar-2`. It won't match neither `server-2-a` nor `server-2-b`.
 
 Another possibility:
 
-    ./itermonkey.py 'server.*?a'
+    ./itermoxyl.py 'server.*?a'
 
 Will match `server-1-a` and `server-2-a`.
 
 The script will show you all hosts matching your query and ask for confirmation before connecting to them.
 
----
-
-Inspired by [itermocil](https://github.com/TomAnthony/itermocil), which was inspired by [teamocil](https://github.com/remiprev/teamocil).
