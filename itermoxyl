@@ -2,6 +2,7 @@
 
 import argparse
 import re
+import signal
 import subprocess
 import sys
 from math import ceil
@@ -24,6 +25,12 @@ parser.add_argument("pattern", help="A regular expression used to select hosts b
 parser.add_argument("-d", "--debug", action="store_true", default=False,
                     help="Just dump Applescript, do not execute")
 arguments = parser.parse_args()
+
+
+# noinspection PyUnusedLocal
+def signal_handler(sig, frame):
+    # Gracefully exit if Ctrl+C is pressed
+    exit(0)
 
 
 def load_hosts():
@@ -174,4 +181,5 @@ def main():
         prepare_and_run_applescript(selected_hosts)
 
 
+signal.signal(signal.SIGINT, signal_handler)
 main()
