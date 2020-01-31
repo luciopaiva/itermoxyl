@@ -8,13 +8,13 @@ from math import ceil
 from os.path import expanduser
 
 home = expanduser("~")
-host_re = re.compile(r"host\s+(\S+)", re.IGNORECASE)
+host_re = re.compile(r"host\s+([^\s*?]+)", re.IGNORECASE)
 hostname_re = re.compile(r"hostname\s+(\S+)", re.IGNORECASE)
 # this regexp will extract a integer suffix, if ones exists, then use
 # the prefix as first sorting field and the suffix and the second one
 host_split = re.compile(r"(\D+(?:\d+\D+)*)(\d+)")
 
-hostname_by_host = {}
+available_hosts = set()
 
 parser = argparse.ArgumentParser(
     description="Tool to automatically open several ssh connections in iTerm2 by querying ~/.ssh/config")
@@ -27,6 +27,8 @@ arguments = parser.parse_args()
 
 
 def load_hosts():
+    """ Here we collect all hosts available in ~/.ssh/config.
+    """
     with open(home + "/.ssh/config") as f:
         current_host = None
         for line in f.readlines():
@@ -34,10 +36,10 @@ def load_hosts():
             if result:
                 current_host = result.group(1)
             elif current_host is not None:
+                # for a host to be selected, it must have a `HostName` property
                 result = hostname_re.search(line)
                 if result:
-                    hostname_by_host[current_host] = result.group(1)
-                    current_host = None
+                    available_hosts.add(current_host)
 
 
 def check_if_iterm_version_is_supported():
@@ -150,7 +152,7 @@ def main():
     load_hosts()
 
     # get filtered list of hosts, each a tuple (name, address)
-    selected_hosts = list(host for host in hostname_by_host.keys() if pat.search(host))
+    selected_hosts = list(host for host in available_hosts if pat.search(host))
 
     if len(selected_hosts) == 0:
         print("There are no hosts that match the given filter.")
