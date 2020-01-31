@@ -50,9 +50,12 @@ Will open `server-1-a` and `server-2-a`.
 
 ## How to install
 
-Simply download this repository and possibly add it to the path for convenience.
+`cd` to the destination directory and:
 
-You need to have iTerm2 installed, of course, but nothing more. The script is written in Python 2.7 and your MacOS already comes with it installed.
+    curl -O https://raw.githubusercontent.com/luciopaiva/itermonkey/master/itermonkey.py
+    chmod u+x itermonkey.py
+
+You need to have iTerm2 installed (obviously), but nothing else. The script is written in Python 2.7 and your macOS already comes bundled with it.
 
 ---
 
