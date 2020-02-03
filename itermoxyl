@@ -6,14 +6,17 @@ import signal
 import subprocess
 import sys
 from math import ceil
-from os.path import expanduser
+from os.path import expanduser, normpath, join
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
 VERSION_PATCH = 0
 
+CONFIG_PATH = expanduser("~/.ssh/")
+
 home = expanduser("~")
 host_re = re.compile(r"host\s+([^\s*?]+)", re.IGNORECASE)
+include_re = re.compile(r"include\s+(.*)", re.IGNORECASE)
 hostname_re = re.compile(r"hostname\s+(\S+)", re.IGNORECASE)
 # this regexp will extract a integer suffix, if ones exists, then use
 # the prefix as first sorting field and the suffix and the second one
@@ -36,11 +39,12 @@ def signal_handler(sig, frame):
     exit(0)
 
 
-def load_hosts():
+def load_hosts(config_file_name="config", available_hosts=None):
     """ Here we collect all hosts available in ~/.ssh/config.
     """
-    with open(home + "/.ssh/config") as f:
-        available_hosts = set()
+    with open(normpath(join(CONFIG_PATH, expanduser(config_file_name)))) as f:
+        if available_hosts is None:
+            available_hosts = set()
 
         current_host = None
         for line in f.readlines():
@@ -48,6 +52,10 @@ def load_hosts():
             line = line.strip()
             if line.startswith("#"):
                 continue
+
+            result = include_re.search(line)
+            if result:
+                load_hosts(result.group(1), available_hosts)
 
             # look for `Host` lines
             result = host_re.search(line)

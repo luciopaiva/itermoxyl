@@ -5,6 +5,13 @@ iTermoxyl is command line tool to automatically open multiple ssh connections in
 
 It is a slightly different medicine for a slightly different problem. iTermoxyl was inspired by [itermocil](https://github.com/TomAnthony/itermocil), which was inspired by [teamocil](https://github.com/remiprev/teamocil).
 
+iTermoxyl is designed to be simple to use, with minimal interaction needed to get it running.
+
+Features:
+
+- doesn't require any configuration files (tools like `i2cssh` require you to manually create YAML descriptions of your environments)
+- regexp support: no need to type in the name of each machine you want to connect to
+
 ## How to install
 
 `cd` to the destination directory and:
