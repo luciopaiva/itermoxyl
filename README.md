@@ -66,7 +66,11 @@ Another possibility:
 
     itermoxyl 'server.*?a'
 
-Will match `server-1-a` and `server-2-a`.
+Will match `server-1-a` and `server-2-a`. Even simpler, iTermoxyl automatically adds the `.*?` part if you provide the terms separated by spaces, like so:
+
+    itermoxyl server a
+
+This has the exact same effect as the regexp construction above.
 
 The script will show you all hosts matching your query and ask for confirmation before connecting to them.
 

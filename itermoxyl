@@ -23,13 +23,16 @@ hostname_re = re.compile(r"hostname\s+(\S+)", re.IGNORECASE)
 host_split = re.compile(r"(\D+(?:\d+\D+)*)(\d+)")
 
 parser = argparse.ArgumentParser(
-    description="Tool to automatically open several ssh connections in iTerm2 by querying ~/.ssh/config")
+    description="Tool to automatically open several ssh connections in iTerm2 by querying ~/.ssh/config. " 
+                "Check https://github.com/luciopaiva/itermoxyl for more details.")
 parser.add_argument("-r", "--run", dest="should_actually_run", action="store_true", default=False,
                     help="Must pass this to actually run, otherwise will just list matching hosts")
 parser.add_argument("-d", "--debug", action="store_true", default=False,
                     help="Just dump Applescript, do not execute")
 parser.add_argument("-v", "--version", action="store_true", default=False, help="Just print version and exit")
-parser.add_argument("pattern", nargs='?', help="Regular expression used to filter hosts by name", default=None)
+parser.add_argument("pattern", nargs='*', help="Regular expression used to filter hosts by name. You can provide "
+                                               "multiple regexps separated by spaces and they will be concatenated " 
+                                               "internally using `.*?`.", default=None)
 arguments = parser.parse_args()
 
 
@@ -185,11 +188,12 @@ def main():
         print("iTerm2 version not supported or not installed")
         exit(1)
 
-    if arguments.pattern is None:
+    if type(arguments.pattern) is not list or len(arguments.pattern) == 0:
         parser.print_help()
         exit(1)
 
-    pat = re.compile(arguments.pattern, re.IGNORECASE)
+    loose_search = ".*?".join(arguments.pattern)
+    pat = re.compile(loose_search, re.IGNORECASE)
     available_hosts = load_hosts()
 
     # get filtered list of hosts, each a tuple (name, address)
