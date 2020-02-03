@@ -9,7 +9,7 @@ from math import ceil
 from os.path import expanduser, normpath, join
 
 VERSION_MAJOR = 1
-VERSION_MINOR = 0
+VERSION_MINOR = 1
 VERSION_PATCH = 0
 
 CONFIG_PATH = expanduser("~/.ssh/")

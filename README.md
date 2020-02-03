@@ -9,8 +9,11 @@ iTermoxyl is designed to be simple to use, with minimal interaction needed to ge
 
 Features:
 
+- directly learns about existing hosts by reading `~/.ssh/config`
 - doesn't require any configuration files (tools like `i2cssh` require you to manually create YAML descriptions of your environments)
 - regexp support: no need to type in the name of each machine you want to connect to
+- supports [ssh config Include directives](https://man.openbsd.org/ssh_config#Include)
+- supports loose searches (see below)
 
 ## How to install
 
