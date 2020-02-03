@@ -97,7 +97,7 @@ def init_pane(number, host):
     return """
         tell pane_{number}
             write text "ssh {host}"
-            set name to "this is me testing"
+            set name to "${host}"
         end tell
         """.format(number=number, host=host)
 
