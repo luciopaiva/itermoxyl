@@ -9,7 +9,7 @@ from math import ceil
 from os.path import expanduser, normpath, join
 
 VERSION_MAJOR = 1
-VERSION_MINOR = 1
+VERSION_MINOR = 2
 VERSION_PATCH = 0
 
 CONFIG_PATH = expanduser("~/.ssh/")
@@ -21,6 +21,8 @@ hostname_re = re.compile(r"hostname\s+(\S+)", re.IGNORECASE)
 # this regexp will extract a integer suffix, if ones exists, then use
 # the prefix as first sorting field and the suffix and the second one
 host_split = re.compile(r"(\D+(?:\d+\D+)*)(\d+)")
+comma_list_of_indexes = re.compile(r"(?:\d+(?:-\d+)?)(?:,\d+(?:-\d+)?)*")  # e.g.: 1,3-5,7-11,20,30-100
+item_range = re.compile(r"(\d+)-(\d+)")
 
 parser = argparse.ArgumentParser(
     description="Tool to automatically open several ssh connections in iTerm2 by querying ~/.ssh/config. " 
@@ -179,6 +181,43 @@ def sort_hosts(selected_hosts):
     return sorted(selected_hosts, key=lambda host: split_host_by_prefix_and_suffix(host))
 
 
+def try_last_term_as_list_of_indexes(pattern):
+    if len(pattern) > 1:  # must have at least one term before
+        list_of_indexes = comma_list_of_indexes.match(pattern[-1])  # try to match a special term at the end
+        if list_of_indexes is not None:
+            # last pattern term is a list of ids, treat it differently
+            list_of_indexes = list_of_indexes.group(0).split(",")
+            expanded_list = []
+            for item in list_of_indexes:
+                range_result = item_range.match(item)
+                if range_result is not None:
+                    range_begin = int(range_result.group(1))
+                    range_end = int(range_result.group(2))
+                    if range_begin > range_end:
+                        print("Range '{}' is invalid".format(item))
+                        exit(1)
+                    for i in range(range_begin, range_end + 1):
+                        expanded_list.append(str(i))
+                else:
+                    expanded_list.append(item)
+            # replace the original special term with its resulting regular expression
+            # the RE matches any number in the list as long as it:
+            # 1. is not preceded by a numeric digit
+            # 2. is at the very end of the name of the machine
+            pattern[-1] = r"(?<!\d)(?:{})$".format("|".join(expanded_list))
+            return True
+    return False
+
+
+def try_expand_list_of_names(pattern, look_at_last_term):
+    for i in range(0, len(pattern)):
+        if not look_at_last_term and i == len(pattern):
+            break
+        term = pattern[i]
+        if "," in term:
+            pattern[i] = "(?:{})".format(term.replace(",", "|"))
+
+
 def main():
     if arguments.version:
         print("{}.{}.{}".format(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH))
@@ -192,7 +231,10 @@ def main():
         parser.print_help()
         exit(1)
 
-    loose_search = ".*?".join(arguments.pattern)
+    has_list_of_indexes = try_last_term_as_list_of_indexes(arguments.pattern)
+    try_expand_list_of_names(arguments.pattern, has_list_of_indexes)
+
+    loose_search = ".*?".join(["(?:{})".format(p) for p in arguments.pattern])
     pat = re.compile(loose_search, re.IGNORECASE)
     available_hosts = load_hosts()
 
