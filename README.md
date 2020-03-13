@@ -1,5 +1,5 @@
 
-![iTermoxyl](itermoxyl.png)
+![iTermoxyl](banner.png)
 
 # iTermoxyl
 
