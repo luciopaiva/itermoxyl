@@ -1,4 +1,6 @@
 
+![iTermoxyl](itermoxyl.png)
+
 # iTermoxyl
 
 iTermoxyl is command line tool to automatically open multiple ssh connections in [iTerm2](https://iterm2.com/) by directly querying `~/.ssh/config` using patterns provided via the command line.
