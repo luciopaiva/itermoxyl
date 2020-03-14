@@ -7,7 +7,7 @@ iTermoxyl is command line tool to automatically open multiple ssh connections in
 
 It is a slightly different medicine for a slightly different problem. iTermoxyl was inspired by [itermocil](https://github.com/TomAnthony/itermocil), which was inspired by [teamocil](https://github.com/remiprev/teamocil).
 
-iTermoxyl is designed to be simple to use, with minimal interaction needed to get it running.
+iTermoxyl is designed to be simple to use, with minimal interaction needed to get it running. Once ssh connections are established, use iTerm2's broadcast input feature to send commands to all machines at once (`Shell -> Broadcast input` or simply `cmd + shift + i`).
 
 Features:
 
@@ -15,7 +15,7 @@ Features:
 - doesn't require any configuration files (tools like `itermocil` and `i2cssh` require you to manually create YAML descriptions of your environments)
 - smart pattern matching: no need to type in the name of each machine you want to connect to
 - supports [ssh config Include directives](https://man.openbsd.org/ssh_config#Include)
-- supports loose searches (see below)
+- supports loose matches (see below)
 
 ## How to install
 
@@ -24,7 +24,9 @@ Features:
     curl -O https://raw.githubusercontent.com/luciopaiva/itermoxyl/master/itermoxyl
     chmod u+x itermoxyl
 
-You need to have iTerm2 installed (obviously), but nothing else. The script is written in Python 2.7 and your macOS already comes bundled with it.
+Make sure to add it to the path so it can be called anywhere.
+
+You need to have iTerm2 installed (obviously), but nothing else. The script is written in Python 2.7 and your macOS already comes with it.
 
 ## How to use
 
@@ -79,7 +81,7 @@ Let's try a few combinations. To open:
 
        itermoxyl foo 1,3-5
 
-### The underlying pattern matching algorithm
+### The underlying pattern-matching algorithm
 
 The general rule is:
 
