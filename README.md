@@ -5,6 +5,8 @@
 
 iTermoxyl is command line tool to automatically open multiple ssh connections in [iTerm2](https://iterm2.com/) by directly querying `~/.ssh/config` using patterns provided via the command line.
 
+![example](example.gif)
+
 It is a slightly different medicine for a slightly different problem. iTermoxyl was inspired by [itermocil](https://github.com/TomAnthony/itermocil), which was inspired by [teamocil](https://github.com/remiprev/teamocil).
 
 iTermoxyl is designed to be simple to use, with minimal interaction needed to get it running. Once ssh connections are established, use iTerm2's broadcast input feature to send commands to all machines at once (`Shell -> Broadcast input` or simply `cmd + shift + i`).
