@@ -5,6 +5,8 @@ import re
 import signal
 import subprocess
 import sys
+import glob
+import os
 from math import ceil
 from os.path import expanduser, normpath, join
 
@@ -60,7 +62,13 @@ def load_hosts(config_file_name="config", available_hosts=None):
 
             result = include_re.search(line)
             if result:
-                load_hosts(result.group(1), available_hosts)
+                for arg in result.group(1).replace('=', ' ').split(' '):
+                    if arg.startswith('~'):
+                        arg = os.path.expanduser(arg)
+                    elif not arg.startswith('/'):
+                        arg = CONFIG_PATH + arg
+                    for f in list(glob.glob(arg)):
+                        load_hosts(f, available_hosts)
 
             # look for `Host` lines
             result = host_re.search(line)
