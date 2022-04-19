@@ -49,6 +49,9 @@ def signal_handler(sig, frame):
 def load_hosts(config_file_name="config", available_hosts=None):
     """ Here we collect all hosts available in ~/.ssh/config.
     """
+    if os.path.isdir(config_file_name):
+        return
+
     with open(normpath(join(CONFIG_PATH, expanduser(config_file_name)))) as f:
         if available_hosts is None:
             available_hosts = set()
