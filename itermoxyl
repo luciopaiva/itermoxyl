@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 import argparse
 import re
@@ -89,7 +89,7 @@ def check_if_iterm_version_is_supported():
                            stdout=subprocess.PIPE)
 
     version_script = 'set iterm_version to (get version of application "iTerm")'
-    version = str(osa.communicate(bytes(version_script))[0]).strip()
+    version = (osa.communicate(bytes(version_script, encoding='utf-8'))[0]).decode('utf-8')
 
     match = re.search(r"^(\d+)\.(\d+)", version)
     if match:
@@ -102,7 +102,7 @@ def check_if_iterm_version_is_supported():
 def prompt_for_confirmation(hosts_count):
     print("\nNumber of panes to open: %d" % hosts_count)
     sys.stdout.write("Press 'y' to continue (or any other key to abort): ")
-    choice = raw_input().strip().lower()
+    choice = input().strip().lower()
     return choice == "y"
 
 
@@ -165,7 +165,7 @@ def prepare_and_run_applescript(selected_hosts):
     osa = subprocess.Popen(['osascript', '-'],
                            stdin=subprocess.PIPE,
                            stdout=subprocess.PIPE)
-    output = osa.communicate(bytes(script))[0]
+    output = osa.communicate(bytes(script, encoding='utf-8'))[0]
     print(output)
 
 
